@@ -256,7 +256,7 @@ class Four_room_grid:
                 dest_state, dest_action = edge[1]
 
                 if self.policy.matrix[source_state,source_action] and self.policy.matrix[dest_state,dest_action] > 0:
-                    weight = self.policy.matrix[source_state,source_action] * self.policy.matrix[dest_state,dest_action]
+                    weight = 1/self.policy.matrix[source_state,source_action] * 1/self.policy.matrix[dest_state,dest_action]
                 else:
                     weight = 0
 
