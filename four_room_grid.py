@@ -8,7 +8,7 @@ from itertools import product
         
 class Four_room_grid:
 
-    def __init__(self, goal_reward = 100):
+    def __init__(self, goal_reward = 0):
         self.initialize_states()
         self.initialize_actions()
         self.initialize_transition_matrix()
@@ -102,7 +102,7 @@ class Four_room_grid:
         self.transition_matrix = T
 
     def initialize_reward(self, goal_reward):
-        r = np.zeros((self.n_navigable_states, self.n_actions))
+        r = np.zeros((self.n_navigable_states, self.n_actions)) - 1
 
         r[self.state_to_index[(7,1)],3] = goal_reward # go right
         r[self.state_to_index[(8,2)],1] = goal_reward # go down
