@@ -282,7 +282,10 @@ class Four_room_grid:
         """
         INPUT: weighted (bool)
             - if True: The combinatorial Laplacian is calculated for a directed and weighted graph using the formula in 
-                        2005, Chung, F. Laplacians and the Cheeger Inequality for Directed Graphs.
+                        2005, Chung, F. Laplacians and the Cheeger Inequality for Directed Graphs and the precautions as in
+                        Osentoski, Mahadevan, 2007, Learning State-Action Basis functions for Hierarchical MDPs.
+                        "With probability η the agent acts according to the transition matrix P and with probability 1 - nu teleports
+                        to any other vertex in the graph uniformly at random." (similar to page-rank algorithm)
 
             - if False: The combinatorial Laplacian is calculated for a unweighted, undirected graph as L = D-A
 
@@ -398,7 +401,7 @@ class Four_room_grid:
 
 class Policy(Four_room_grid):
 
-    def __init__(self, matrix = None, goal_reward = 100):
+    def __init__(self, matrix = None, goal_reward = 0):
         super().__init__(goal_reward = goal_reward)
         if matrix is None:
             pi_uniform = np.zeros((self.n_navigable_states,self.n_actions)) + 1/4
