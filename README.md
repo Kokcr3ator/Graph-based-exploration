@@ -29,47 +29,6 @@ g,A = grid.create_state_graph()
 L = grid.laplacian_state() # combinatorial laplacian
 norm_L = grid.normalized_laplacian_state() # normalized laplacian
 ```
-Example of uniform policy V linear function approximation using state-graph laplacian eigenvectors:
-```python
-import numpy as np
-from four_room_grid import Four_room_grid
-import matplotlib.pyplot as plt
-
-grid = Four_room_grid()
-L = grid.laplacian_state()
-
-norm_L = grid.normalized_laplacian_state()
-U_combinatorial, _, _ = np.linalg.svd(L)
-U_norm, _, _ = np.linalg.svd(norm_L)
-k_vec = [k+1 for k in range(50)]
-err_vec_combinatorial = []
-err_vec_normalized = []
-uniform_policy = Policy()
-V_uniform = uniform_policy.calculate_V_pi()
-for k in k_vec:
-    phi = U_combinatorial[:,-k:]
-    weights = np.linalg.solve(phi.T@phi, phi.T@V_uniform)
-    V_predicted = phi @ weights
-    err_vec_combinatorial.append(np.mean((V_predicted - V_uniform)**2))
-
-    phi = U_norm[:,-k:]
-    weights = np.linalg.solve(phi.T@phi, phi.T@V_uniform)
-    V_predicted = phi @ weights
-    err_vec_normalized.append(np.mean((V_predicted - V_uniform)**2))
-
-
-plt.figure(figsize=(10, 6))
-plt.plot(k_vec, err_vec_combinatorial, marker='o', label = 'Combinatorial Laplacian')
-plt.plot(k_vec, err_vec_normalized, marker='v', label = 'Normalized Laplacian')
-plt.yscale('log')
-plt.title('V of uniform policy approximation using PVF')
-plt.xlabel('K')
-plt.ylabel('MSE')
-plt.grid(True, which='both', linestyle='--', linewidth=0.5)
-plt.legend()
-plt.show()
-```
-![V function approximation using PVF example](images/V_function_approx.png)
 
 ## State-action graph
 The state action graph has nodes corresponding to each state-action pair.
