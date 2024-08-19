@@ -2,6 +2,7 @@
 This repo contains some experiments of Q function approximation using graph Laplacian-based features on Four room grid environment.
 ## The environment
 The environment is made of 53 navigable states and 47 wall states. The possible actions are 4 (up, down, right and left), the transition from one state to another is deterministic when choosing an action. If the action leads to a wall state the agent stays still in the same state. The tile corrsponding to the goal (represented with a star in the grid) is an absorbing state.
+The reward is -1 until the goal tile is reached, the transition towards the goal tile has reward 0.
 The grid can be plotted as follows:
 ```python
 from four_room_grid import Four_room_grid
@@ -57,6 +58,36 @@ grid.plot_state_action_graph()
 ```
 ![Visualization of the weighted and directed state-action graph](images/weighted_directed_state_action_graph.png)
 
+To approximate the Q function using linear function approximation with the eigenvectors of the state-action graph:
+```python
+import numpy as np
+from four_room_grid import Four_room_grid
+
+def approximate_Q_pi_using_laplacian(k, target_pi, normalized = False, weight_policy = None, return_Q_target = False):
+    grid = Four_room_grid()
+    Q_target = target_pi.calculate_Q_pi(as_vector= True)
+    if weight_policy is None:
+        if normalized:
+            L = grid.normalized_laplacian_state_action()
+        else:
+            L = grid.laplacian_state_action()
+    else:
+        grid.set_policy(weight_policy)
+        if normalized:
+            L = grid.normalized_laplacian_state_action(weighted = True)
+        else:
+            L = grid.laplacian_state_action(weighted= True)        
+
+    U, _, _ = np.linalg.svd(L)
+    phi = U[:,-k:]
+    weights = np.linalg.solve(phi.T@phi, phi.T@Q_target)
+    Q_predicted = phi @ weights
+    
+    if return_Q_target:
+        return Q_predicted, Q_target
+    else:
+        return Q_predicted
+```
 In ```example.ipynb``` there are some examples on the approximation of the Q function using the two different graph representations for different policies.
 
 
