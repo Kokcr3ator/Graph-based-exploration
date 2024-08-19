@@ -65,10 +65,10 @@ from four_room_grid import Four_room_grid
 
 def approximate_Q_pi_using_laplacian(k, target_pi, normalized = False, weight_policy = None, return_Q_target = False):
     grid = Four_room_grid()
-    Q_target = target_pi.calculate_Q_pi(as_vector= True)
+    Q_target = target_pi.calculate_Q_pi(as_vector= True) # true q function
     if weight_policy is None:
         if normalized:
-            L = grid.normalized_laplacian_state_action()
+            L = grid.normalized_laplacian_state_action() 
         else:
             L = grid.laplacian_state_action()
     else:
@@ -79,8 +79,8 @@ def approximate_Q_pi_using_laplacian(k, target_pi, normalized = False, weight_po
             L = grid.laplacian_state_action(weighted= True)        
 
     U, _, _ = np.linalg.svd(L)
-    phi = U[:,-k:]
-    weights = np.linalg.solve(phi.T@phi, phi.T@Q_target)
+    phi = U[:,-k:] # using the eigenvectors associated to the lowest eigenvalues
+    weights = np.linalg.solve(phi.T@phi, phi.T@Q_target) # approximation using OLS
     Q_predicted = phi @ weights
     
     if return_Q_target:
