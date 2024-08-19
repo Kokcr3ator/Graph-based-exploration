@@ -106,6 +106,8 @@ class Four_room_grid:
 
         r[self.state_to_index[(7,1)],3] = goal_reward # go right
         r[self.state_to_index[(8,2)],1] = goal_reward # go down
+        r[self.state_to_index[(8,1)],3] = goal_reward # stay
+        r[self.state_to_index[(8,1)],1] = goal_reward # stay
         self.reward_matrix = r
 
 
@@ -229,7 +231,7 @@ class Four_room_grid:
             for dest_node in nodes:
                 source_state, source_action = source_node
                 dest_state, dest_action = dest_node
-                if source_state == dest_state:
+                if source_state == dest_state and source_action == dest_action:
                     continue
                 else:
                     if self.transition_matrix[source_state, source_action, dest_state] > 0 and sum(self.transition_matrix[dest_state, dest_action, :]) > 0:
@@ -275,7 +277,8 @@ class Four_room_grid:
             _,_ = self.create_state_action_graph()
         
         plt.figure(figsize=(8, 6)) 
-        nx.draw(self.state_action_graph, node_size=20, node_color="blue", edge_color="gray")
+        pos = nx.spring_layout(self.state_action_graph, weight= None)
+        nx.draw(self.state_action_graph, pos, node_size=20, node_color="blue", edge_color="gray")
         plt.show()
 
     def laplacian_state_action(self, weighted = False):
@@ -309,9 +312,10 @@ class Four_room_grid:
                 W = np.array([row if sum(row) > 0 else np.ones(len(self.weight_matrix)) for row in self.weight_matrix])
                 invD = np.diag([1/sum(row) for row in W])
                 P = invD@W
+                P = np.array([row/sum(row) for row in P])
 
                 # Teleport to any node at random with probability nu -> the resulting graph is strongly connected (in this case a clique)
-                nu = 0.01
+                nu = 0.001
                 teleport_P = np.ones(P.shape)
                 teleport_P = np.array([np.array(row)/sum(row) for row in teleport_P])
                 P = (1-nu)*P + nu*teleport_P
@@ -369,9 +373,10 @@ class Four_room_grid:
                 W = np.array([row if sum(row) > 0 else np.ones(len(self.weight_matrix)) for row in self.weight_matrix])
                 invD = np.diag([1/sum(row) for row in W])
                 P = invD@W
+                P = np.array([row/sum(row) for row in P])
 
                 # Teleport to any node at random with probability nu -> the resulting graph is strongly connected (in this case a clique)
-                nu = 0.01
+                nu = 0.001
                 teleport_P = np.ones(P.shape)
                 teleport_P = np.array([np.array(row)/sum(row) for row in teleport_P])
                 P = (1-nu)*P + nu*teleport_P
